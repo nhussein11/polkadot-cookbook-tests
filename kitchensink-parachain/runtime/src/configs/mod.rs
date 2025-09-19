@@ -37,14 +37,14 @@ use frame_support::{
 	dispatch::DispatchClass,
 	parameter_types,
 	traits::{
-		ConstBool, ConstU32, ConstU64, ConstU8, EitherOfDiverse, TransformOrigin, VariantCountOf,
+		ConstBool, ConstU32, ConstU64, ConstU8, EitherOfDiverse, TransformOrigin, VariantCountOf, AsEnsureOriginWithArg,
 	},
 	weights::{ConstantMultiplier, Weight},
 	PalletId,
 };
 use frame_system::{
-	limits::{BlockLength, BlockWeights},
-	EnsureRoot,
+    limits::{BlockLength, BlockWeights},
+    EnsureRoot, EnsureSigned,
 };
 use pallet_xcm::{EnsureXcm, IsVoiceOfBody};
 use parachains_common::message_queue::{NarrowOriginToSibling, ParaIdToSibling};
@@ -62,7 +62,7 @@ use super::{
 	AccountId, Aura, Balance, Balances, Block, BlockNumber, CollatorSelection, ConsensusHook, Hash,
 	MessageQueue, Nonce, PalletInfo, ParachainSystem, Runtime, RuntimeCall, RuntimeEvent,
 	RuntimeFreezeReason, RuntimeHoldReason, RuntimeOrigin, RuntimeTask, Session, SessionKeys,
-	System, WeightToFee, XcmpQueue, AVERAGE_ON_INITIALIZE_RATIO, EXISTENTIAL_DEPOSIT, HOURS,
+	System, WeightToFee, XcmpQueue, AVERAGE_ON_INITIALIZE_RATIO, EXISTENTIAL_DEPOSIT, HOURS, DAYS,
 	MAXIMUM_BLOCK_WEIGHT, MICRO_UNIT, NORMAL_DISPATCH_RATIO, SLOT_DURATION, VERSION, OriginCaller,
 };
 use xcm_config::{RelayLocation, XcmOriginToTransactDispatchOrigin};
@@ -189,6 +189,47 @@ impl pallet_sudo::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type RuntimeCall = RuntimeCall;
 	type WeightInfo = ();
+}
+
+// --- pallet-nfts configuration ---
+parameter_types! {
+    pub const CollectionDeposit: Balance = 1_000 * MICRO_UNIT;
+    pub const ItemDeposit: Balance = 100 * MICRO_UNIT;
+    pub const MetadataDepositBase: Balance = 10 * MICRO_UNIT;
+    pub const AttributeDepositBase: Balance = 10 * MICRO_UNIT;
+    pub const DepositPerByte: Balance = 1 * MICRO_UNIT;
+    pub const MaxDeadlineDurationConst: BlockNumber = DAYS;
+    pub const NftsApprovalsLimit: u32 = 20;
+    pub const NftsItemAttributesApprovalsLimit: u32 = 10;
+    pub FeaturesConst: pallet_nfts::PalletFeatures = pallet_nfts::PalletFeatures::all_enabled();
+}
+
+impl pallet_nfts::Config for Runtime {
+    type RuntimeEvent = RuntimeEvent;
+    type Currency = Balances;
+    type CollectionId = u32;
+    type ItemId = u32;
+    type ForceOrigin = EnsureRoot<AccountId>;
+    type CreateOrigin = AsEnsureOriginWithArg<EnsureSigned<AccountId>>;
+    type CollectionDeposit = CollectionDeposit;
+    type ItemDeposit = ItemDeposit;
+    type MetadataDepositBase = MetadataDepositBase;
+    type AttributeDepositBase = AttributeDepositBase;
+    type DepositPerByte = DepositPerByte;
+    type StringLimit = frame_support::traits::ConstU32<256>;
+    type KeyLimit = frame_support::traits::ConstU32<64>;
+    type ValueLimit = frame_support::traits::ConstU32<256>;
+    type MaxTips = frame_support::traits::ConstU32<10>;
+    type MaxAttributesPerCall = frame_support::traits::ConstU32<10>;
+    type WeightInfo = pallet_nfts::weights::SubstrateWeight<Runtime>;
+    type Locker = ();
+    type ApprovalsLimit = NftsApprovalsLimit;
+    type ItemAttributesApprovalsLimit = NftsItemAttributesApprovalsLimit;
+    type MaxDeadlineDuration = MaxDeadlineDurationConst;
+    type Features = FeaturesConst;
+    type OffchainSignature = sp_runtime::MultiSignature;
+    type OffchainPublic = <sp_runtime::MultiSignature as sp_runtime::traits::Verify>::Signer;
+    type BlockNumberProvider = System;
 }
 
 parameter_types! {
