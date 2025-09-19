@@ -1,0 +1,4 @@
+name: Add NFT Pallet to Polkadot SDK Runtime
+description: Beginner tutorial to integrate pallet-nfts into a Substrate-based runtime.
+type: sdk
+needs_node: true

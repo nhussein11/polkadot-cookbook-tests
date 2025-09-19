@@ -319,6 +319,10 @@ mod runtime {
 
     #[runtime::pallet_index(52)]
     pub type CustomPallet = custom_pallet;
+
+	// NFTs
+	#[runtime::pallet_index(53)]
+	pub type Nfts = pallet_nfts;
 }
 
 #[docify::export(register_validate_block)]

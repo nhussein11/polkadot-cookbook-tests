@@ -1,0 +1,19 @@
+{
+  "name": "add-nft-pallet",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^1.6.0",
+    "@types/node": "^20.11.30"
+  },
+  "dependencies": {
+    "@polkadot/api": "^12.4.1",
+    "ws": "^8.17.1"
+  }
+}
