@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import net from 'node:net';
 import { spawn } from 'node:child_process';
+import net from 'node:net';
 import fs from 'node:fs';
 import path from 'node:path';
 
