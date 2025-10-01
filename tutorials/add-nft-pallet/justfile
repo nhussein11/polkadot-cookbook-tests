@@ -1,0 +1,22 @@
+default:
+	@just --list
+
+build-runtime:
+	cd kitchensink-parachain && cargo build --release
+
+generate-chain-spec:
+	cd kitchensink-parachain && chain-spec-builder create -t development --relay-chain paseo --para-id 1000 --runtime ./target/release/wbuild/parachain-template-runtime/parachain_template_runtime.compact.compressed.wasm named-preset development
+
+start-node:
+	cd kitchensink-parachain && polkadot-omni-node --chain ./chain_spec.json --dev --dev-block-time 1000
+
+dev:
+	just build-runtime
+	just generate-chain-spec
+	just start-node
+
+test-setup:
+	npm ci || npm i
+
+test:
+	npm run test
